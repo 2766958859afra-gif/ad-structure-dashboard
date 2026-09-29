@@ -442,6 +442,18 @@ function adjChip(c){
   const d=daysSince(a.date), cool=d<=COOL;
   return `<span class="${cool?'cool':'free'}" title="${esc(a.action||'')} ${esc(a.note||'')}">上次调整 ${a.date.slice(5)}（${d}天前）${cool?' · 别再动':''}</span>`;
 }
+/* 状态：领星有值就用；没有就用 BI 数据推断（最后有花费/曝光是哪天），不再显示「状态待核」 */
+function statusOf(v){
+  if(v.lx_status==='enabled') return '<span class="badge b-on">开启</span>';
+  if(v.lx_status==='paused'||v.lx_status==='archived') return `<span class="badge b-off">${esc(v.lx_status)}</span>`;
+  if(v.lx_status) return `<span class="badge b-on">${esc(v.lx_status)}</span>`;
+  const d=v.d||[]; let last=-1;
+  for(let i=d.length-1;i>=0;i--){ const x=d[i]; if(x && (x[0]>0.005 || (x[4]||0)>0)){ last=i; break; } }
+  if(last<0) return '<span class="badge b-off">无投放数据</span>';
+  const idle=d.length-1-last;
+  if(idle<=2) return '<span class="badge b-on">在跑·BI推断</span>';
+  return `<span class="badge b-off">已停 ${idle} 天·BI推断</span>`;
+}
 function warnsOf(it,w){
   const r=[];
   if(w.sp>=10&&w.clk>0&&w.ord===0) r.push('花钱没单');
@@ -518,7 +530,8 @@ function render(){
     if(fch&&it.ch!==fch)return false;
     if(fg&&String(it.grade||'').trim()!==fg)return false;
     if($('#onlywarn').checked&&!r.warns.length)return false;
-    if(q){const h=(it.asin+' '+it.sku+' '+it.name+' '+it.camps.join(' ')).toLowerCase();if(!h.includes(q))return false;}
+    if(q){const nz=s=>String(s==null?'':s).toLowerCase().replace(/[\s\-_－—–·．.，,、/\\()（）【】\[\]]+/g,'');
+    const h=nz(it.asin+' '+it.sku+' '+it.name+' '+it.camps.join(' '));if(!h.includes(nz(q)))return false;}
     return true;});
   rows.sort((a,b)=> so==='acos'? ((b.w.acos??-1)-(a.w.acos??-1)) : so==='ratio'? ((b.it.ratio??-1)-(a.it.ratio??-1))
     : so==='q'? (b.it.q-a.it.q) : so==='sa'? (b.w.sa-a.w.sa) : (b.w.sp-a.w.sp));
@@ -606,8 +619,7 @@ function spark(d){
 }
 function campCard(c){
   const v=DATA.camps[c], w=agg(v.d,A,B);
-  const st=v.lx_status==='enabled'?'<span class="badge b-on">开启</span>'
-    :(v.lx_status?`<span class="badge b-off">${esc(v.lx_status)}</span>`:'<span class="badge b-unknown">状态待核</span>');
+  const st=statusOf(v);
   const N=DATA.meta.days.length;
   let lastDay=''; for(let i=N-1;i>=0;i--){const x=v.d[i]; if(x&&x[0]>0){lastDay=DATA.meta.days[i];break;}}
   let firstDay=''; for(let i=0;i<N;i++){const x=v.d[i]; if(x){firstDay=DATA.meta.days[i];break;}}
