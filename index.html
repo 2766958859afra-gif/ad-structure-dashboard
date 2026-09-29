@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>向海 · 商编广告结构与时段分析</title>
+<style>
+:root{--blue:#3559c7;--red:#c7484f;--gold:#e5cf83;--green:#2c855b;--teal:#16857a;--grey:#8899cc;
+--ink:#1b2333;--ink2:#5d6878;--line:#e3e8f3;--bg:#f4f7fc;--card:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 "Microsoft YaHei","PingFang SC",system-ui,sans-serif}
+.wrap{max-width:1880px;margin:0 auto;padding:24px 30px 70px}
+h1{font-size:25px;margin:0 0 6px}
+.sub{color:var(--ink2);font-size:13.5px;margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:16px}
+.tl{padding:14px 18px 16px}
+.tl .row1{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.pill{border:1px solid #c3d0f2;background:#fff;color:var(--blue);border-radius:8px;padding:6px 13px;
+font-size:13.5px;cursor:pointer}
+.pill.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.pill:hover{filter:brightness(1.05)}
+input[type=date]{padding:6px 9px;border:1px solid var(--line);border-radius:8px;font-size:13.5px;font-family:inherit}
+.winlab{font-size:13.5px;color:var(--ink2);margin-left:auto}
+.winlab b{color:var(--blue);font-size:15px}
+.tlbars{display:flex;align-items:flex-end;gap:2px;height:74px;background:#f8fafe;border:1px solid var(--line);
+border-radius:9px;padding:6px 6px 0;cursor:crosshair;user-select:none}
+.tlbars .b{flex:1;background:#cfd9f2;border-radius:2px 2px 0 0;min-height:2px;transition:background .08s}
+.tlbars .b.in{background:var(--blue)}
+.tlbars .b:hover{background:var(--gold)}
+.tlaxis{display:flex;gap:2px;margin-top:3px}
+.tlaxis span{flex:1;font-size:9px;color:#9aa5bb;text-align:center;white-space:nowrap;overflow:hidden}
+.hint{font-size:12px;color:var(--ink2);margin-top:6px}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:13px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:15px 17px}
+.kpi .lab{font-size:12.5px;color:var(--ink2)}
+.kpi .val{font-size:25px;font-weight:700;margin-top:4px}
+.kpi.blue .val{color:var(--blue)} .kpi.red .val{color:var(--red)} .kpi.green .val{color:var(--green)}
+.delta{font-size:12.5px;margin-top:3px}
+.delta.up{color:var(--red)} .delta.down{color:var(--green)} .delta.flat{color:var(--ink2)}
+.sec{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:16px;overflow:hidden}
+.sec > h2{font-size:15.5px;margin:0;padding:13px 18px;background:#eff3fc;color:#37456a;cursor:pointer;
+display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}
+.sec > h2 .cnt{font-size:13px;font-weight:400;color:var(--ink2)}
+.sec .body{padding:13px 18px}
+.sec.collapsed .body{display:none}
+.alertbars{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+.ab{border:1px solid var(--line);border-radius:12px;padding:13px 15px;background:#fbfcff}
+.ab.hot{background:#fdf4f4;border-color:#f3d7d9}
+.ab .t{font-size:14px;font-weight:600;color:var(--red)}
+.ab .n{font-size:24px;font-weight:700;margin-top:3px}
+.ab .d{font-size:12px;color:var(--ink2);margin-top:3px}
+.alist{margin-top:9px;max-height:330px;overflow:auto}
+.arow{display:flex;gap:10px;align-items:baseline;padding:6px 0;border-top:1px dashed var(--line);font-size:12.5px}
+.arow .nm{font-family:Consolas,monospace;flex:1;word-break:break-all;cursor:pointer}
+.arow .nm:hover{color:var(--blue)}
+.arow .num{white-space:nowrap;font-weight:600;color:var(--red)}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:13.5px}
+th{background:#eff3fc;color:#37456a;font-weight:600;text-align:left;padding:10px 9px;
+border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0;z-index:2}
+td{padding:10px 9px;border-bottom:1px solid var(--line);vertical-align:top}
+tr.item:hover{background:#fafbff}
+.tri{width:20px;color:var(--grey);cursor:pointer;font-weight:700;user-select:none}
+.asin{font-family:Consolas,monospace;font-weight:700;color:#22305a}
+.sku{font-family:Consolas,monospace;font-size:12px;color:var(--ink2)}
+.nm2{font-size:12px;color:var(--ink2)}
+.grade{display:inline-block;background:var(--blue);color:#fff;border-radius:5px;font-size:10.5px;padding:1px 6px}
+.grade.A{background:var(--green)} .grade.S{background:#b8860b} .grade.D{background:var(--grey)}
+.num{text-align:right;white-space:nowrap}
+.warn{color:var(--red);font-weight:700}
+.ok{color:var(--green)}
+.tagrow{display:flex;flex-wrap:wrap;gap:5px}
+.tg{background:#eef2fd;border:1px solid #d8e0f6;color:#2d3f6e;border-radius:6px;padding:2px 7px;font-size:11.5px;cursor:pointer}
+.tg:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+.detail{background:#f8faff}
+.campbox{display:grid;grid-template-columns:repeat(auto-fill,minmax(430px,1fr));gap:10px}
+.shopgrp{grid-column:1/-1;font-size:12.5px;color:var(--blue);font-weight:700;margin-top:4px}
+.camp{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 11px}
+.camp .cn{font-family:Consolas,monospace;font-size:12px;word-break:break-all;cursor:pointer;color:#22305a}
+.camp .cn:hover{color:var(--blue);text-decoration:underline}
+.camp .meta{display:flex;flex-wrap:wrap;gap:8px;font-size:11.5px;color:var(--ink2);margin-top:5px}
+.camp .meta b{color:var(--ink)}
+.badge{border-radius:5px;padding:1px 6px;font-size:11px}
+.b-on{background:#e8f5ee;color:var(--green)}
+.b-off{background:#fdecec;color:var(--red)}
+.b-unknown{background:#f1f2f6;color:var(--ink2)}
+.b-type{background:#f1f4fd;color:#3a4a7a}
+.spark{display:flex;align-items:flex-end;gap:1px;height:22px;width:110px}
+.spark i{flex:1;background:#cfd9f2;border-radius:1px;min-height:1px}
+.spark i.hot{background:var(--red)}
+.note{width:100%;border:1px solid var(--line);border-radius:7px;padding:5px 7px;font-size:12.5px;
+font-family:inherit;resize:vertical;min-height:32px}
+.note:focus{outline:2px solid #c3d0f2;border-color:var(--blue)}
+.tools{display:flex;gap:9px;align-items:center;margin-bottom:11px;flex-wrap:wrap}
+.btn{background:var(--blue);color:#fff;border:0;border-radius:8px;padding:8px 14px;font-size:13.5px;cursor:pointer}
+.btn.ghost{background:#fff;color:var(--blue);border:1px solid #c3d0f2}
+input.f,select.f{padding:7px 10px;border:1px solid var(--line);border-radius:8px;font-size:13.5px;font-family:inherit}
+.toast{position:fixed;left:50%;bottom:36px;transform:translateX(-50%);background:#1b2333;color:#fff;
+padding:10px 20px;border-radius:9px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:99}
+.toast.on{opacity:1}
+.busy{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--blue);color:#fff;
+padding:7px 18px;border-radius:9px;font-size:13.5px;display:none;z-index:100;box-shadow:0 4px 14px rgba(53,89,199,.3)}
+.foot{color:var(--ink2);font-size:12.5px;line-height:1.9;margin-top:14px}
+.chk{display:flex;gap:9px;align-items:baseline;font-size:12.5px;padding:4px 0;border-top:1px dashed var(--line)}
+.chk .ok{color:var(--green);font-weight:700}
+.chk .no{color:var(--red);font-weight:700}
+.adjr{display:flex;gap:10px;align-items:baseline;font-size:12.5px;padding:5px 0;border-top:1px dashed var(--line)}
+.adjr .c{font-family:Consolas,monospace;flex:1;word-break:break-all;cursor:pointer}
+.adjr .c:hover{color:var(--blue)}
+.cool{background:#fdecec;color:var(--red);border-radius:5px;padding:1px 6px;font-size:11px}
+.free{background:#e8f5ee;color:var(--green);border-radius:5px;padding:1px 6px;font-size:11px}
+.markbtn{border:1px solid #cfd8ee;background:#fff;border-radius:6px;color:var(--ink2);cursor:pointer;
+font-size:11px;padding:2px 7px;margin-left:6px}
+.markbtn:hover{border-color:var(--blue);color:var(--blue)}
+tr.coolrow{background:#fffafa}
+</style></head>
+<body><div class="wrap">
+<h1>向海 · 商编广告结构与时段分析</h1>
+<p class="sub" id="sub">加载中…</p>
+
+<div class="card tl">
+  <div class="row1">
+    <button class="pill" data-d="7">近 7 天</button>
+    <button class="pill" data-d="14">近 14 天</button>
+    <button class="pill" data-d="30">近 30 天</button>
+    <button class="pill" data-d="0">全部</button>
+    <span style="color:#c8cfe0">|</span>
+    <input type="date" id="d1"><span style="color:var(--ink2)">→</span><input type="date" id="d2">
+    <span class="winlab" id="winlab"></span>
+  </div>
+  <div class="tlbars" id="tlbars"></div>
+  <div class="tlaxis" id="tlaxis"></div>
+  <div class="hint">在柱状图上按住拖动即可框选任意时段（松开生效）；柱子高度 = 当天全部活动的广告花费。</div>
+</div>
+
+<div class="card" id="healthCard" style="padding:13px 18px">
+  <div class="row1" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <b style="font-size:14.5px;color:#37456a">数据体检</b>
+    <span id="h-ts" style="font-size:12.5px;color:var(--ink2)">加载中…</span>
+    <button class="btn" style="margin-left:auto" onclick="doRefresh()">🔄 一键刷新（对接 BI / ERP / 领星）</button>
+  </div>
+  <div id="h-checks" style="margin-top:8px"></div>
+</div>
+
+<div class="card" id="adjCard" style="padding:13px 18px">
+  <div class="row1" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <b style="font-size:14.5px;color:#37456a">调整台账</b>
+    <span id="adj-sum" style="font-size:12.5px;color:var(--ink2)">加载中…</span>
+    <span style="font-size:12.5px;color:var(--ink2);margin-left:auto">冷却期
+      <input type="number" id="cool" value="7" min="1" max="30"
+        style="width:56px;padding:3px 6px;border:1px solid var(--line);border-radius:6px"> 天（期间不要重复调同一活动）</span>
+  </div>
+  <div id="adj-list" style="margin-top:8px;max-height:220px;overflow:auto"></div>
+</div>
+
+<div class="kpis" id="kpis"></div>
+
+<div class="sec" id="sec-alerts"><h2 onclick="toggle('sec-alerts')">异常提醒（按所选时段重算）<span class="cnt" id="alertcnt"></span></h2>
+<div class="body"><div class="alertbars" id="alertbars"></div><div id="alertdetail"></div></div></div>
+
+<div class="sec"><h2 onclick="toggle('sec-main')">按 ASIN / 商编 看广告结构 <span class="cnt" id="maincnt"></span></h2>
+<div class="body">
+<div class="tools">
+  <input class="f" id="q" placeholder="搜索 ASIN / 商编 / 品类 / 活动名" style="min-width:260px">
+  <select class="f" id="fch"><option value="">全部渠道</option></select>
+  <select class="f" id="fgrade"><option value="">全部等级</option></select>
+  <select class="f" id="fsort">
+    <option value="sp">按广告花费排序</option>
+    <option value="sa">按广告销售额排序</option>
+    <option value="acos">按 ACoS 从高到低</option>
+    <option value="ratio">按库销比排序</option>
+    <option value="q">按近30天销量排序</option>
+  </select>
+  <label style="font-size:13.5px;color:var(--ink2)"><input type="checkbox" id="onlywarn"> 只看有异常的</label>
+  <button class="btn ghost" onclick="expandAll()">展开前 40 行</button>
+  <button class="btn ghost" onclick="collapseAll()">收起全部</button>
+</div>
+<table><thead><tr>
+<th class="tri"></th><th>ASIN / 商编</th><th>品类 · 等级</th><th>渠道</th>
+<th class="num">库存（FBA可用/在途）</th><th class="num">本地</th><th class="num">海外仓</th>
+<th class="num">采购在途</th><th class="num">近30天销量</th><th class="num">可用库销比<div style="font-weight:400;font-size:11px;color:#8899cc">FBA可用 ÷ 近30天销量</div></th>
+<th class="num" id="th-spend">时段花费</th><th>广告结构（点标签看活动）</th><th style="min-width:160px">备注</th>
+</tr></thead><tbody id="tb"></tbody></table>
+</div></div>
+
+<div class="sec" id="sec-multi"><h2 onclick="toggle('sec-multi')">多 ASIN 活动 <span class="cnt" id="multicnt"></span></h2>
+<div class="body"><table><thead><tr>
+<th></th><th>广告活动</th><th>类型</th><th class="num">ASIN数</th><th class="num">时段花费</th>
+<th class="num">ACoS</th><th class="num">点击</th><th class="num">订单</th></tr></thead>
+<tbody id="mtb"></tbody></table></div></div>
+
+<div class="foot" id="foot"></div>
+</div>
+<div class="busy" id="busy">⏳ 正在重算…</div>
+<div class="toast" id="toast"></div>
+<script>
+let DATA=null, NOTES={}, ADJ={}, openRows=new Set(), A=0, B=0, COOL=7, ONLINE=false;
+const LS={notes:'adboard_notes', adj:'adboard_adj', cool:'adj_cool'};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(window._t);
+window._t=setTimeout(()=>t.classList.remove('on'),1500);}
+function cp(t,m){navigator.clipboard.writeText(t).then(()=>toast(m||'已复制')).catch(()=>{
+const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();
+document.execCommand('copy');a.remove();toast(m||'已复制');});}
+function toggle(id){document.getElementById(id).classList.toggle('collapsed');}
+const TYPE_ORDER=['自动','关键词-混合','关键词-广泛','关键词-词组','关键词-精准','定位-商品竞对','定位-类目','定位-其他','其他','SB/SD'];
+const ZE=[0,0,0,0,0];
+function agg(d,a,b){let sp=0,clk=0,ord=0,sa=0,imp=0;
+  for(let i=a;i<=b;i++){const v=d[i];if(v){sp+=v[0];clk+=v[1];ord+=v[2];sa+=v[3];imp+=v[4];}}
+  return {sp,clk,ord,sa,imp,acos:sa?sp/sa*100:null};}
+
+async function load(){
+  DATA=await (await fetch('data.json?t='+Date.now())).json();
+  try{ const _h=await fetch('api/health'); ONLINE=_h.ok && !!(await _h.json()).ts; }catch(e){ ONLINE=false; }
+  if(ONLINE){
+    try{NOTES=await (await fetch('api/notes')).json();}catch(e){NOTES={};}
+    try{ADJ=await (await fetch('api/adjustments?t='+Date.now())).json();}catch(e){ADJ={};}
+  }else{
+    try{NOTES=JSON.parse(localStorage.getItem(LS.notes)||'{}');}catch(e){NOTES={};}
+    try{ADJ=JSON.parse(localStorage.getItem(LS.adj)||'{}');}catch(e){ADJ={};}
+  }
+  const cEl=document.getElementById('cool');
+  if(cEl){ COOL=+localStorage.getItem(LS.cool)||7; cEl.value=COOL;
+    cEl.onchange=()=>{ COOL=Math.max(1,+cEl.value||7); localStorage.setItem(LS.cool,COOL);
+      cEl.value=COOL; renderAdjBar(); scheduleRender(); }; }
+  const m=DATA.meta, N=m.days.length;
+  A=Math.max(0,N-7); B=N-1;
+  // 预计算 ASIN 逐日
+  DATA.items.forEach(it=>{
+    const d=new Array(N).fill(null);
+    it.camps.forEach(c=>{
+      const ca=DATA.camps[c].da||{}, cd=ca[it.asin];
+      if(!cd) return;
+      for(let i=0;i<N;i++){const v=cd[i];if(!v)continue;
+        if(!d[i])d[i]=[0,0,0,0,0];
+        d[i][0]+=v[0];d[i][1]+=v[1];d[i][2]+=v[2];d[i][3]+=v[3];d[i][4]+=v[4];}});
+    it.dd=d;
+    it.q=it.sales30q||0;
+    it.ratio=it.ratio_usable;
+    // 固定「近 7 天点击」（不随时段选择变化，用于「有货不动」判定）
+    let c7=0; for(let i=Math.max(0,N-7);i<N;i++){const v=d[i];if(v)c7+=v[1];}
+    it.clk7=c7;
+  });
+  // 时间轴：每日总花费（活动级去重口径）
+  const tot=DATA.tot_d.map(x=>x?x[0]:0);
+  const mx=Math.max(...tot,1);
+  $('#tlbars').innerHTML=tot.map((v,i)=>`<div class="b" data-i="${i}" style="height:${Math.max(2,v/mx*62).toFixed(1)}px" title="${m.days[i]}  $${v.toFixed(0)}"></div>`).join('');
+  const step=Math.ceil(N/10);
+  $('#tlaxis').innerHTML=m.days.map((d,i)=>`<span>${i%step===0?d.slice(5):''}</span>`).join('');
+  $('#d1').value=m.days[0]; $('#d2').value=m.days[N-1];
+  $('#d1').min=$('#d2').min=m.days[0]; $('#d1').max=$('#d2').max=m.days[N-1];
+
+  const chs=[...new Set(DATA.items.map(i=>i.ch))].filter(Boolean).sort();
+  $('#fch').innerHTML+=''+chs.map(c=>`<option>${c}</option>`).join('');
+  const gs=[...new Set(DATA.items.map(i=>String(i.grade||'').trim()).filter(Boolean))].sort();
+  $('#fgrade').innerHTML+=''+gs.map(c=>`<option>${c}</option>`).join('');
+
+  bindTL();
+  render();
+}
+
+function winLabel(){
+  const m=DATA.meta, n=B-A+1, prevA=A-n, prevB=A-1;
+  return {n, prevA, prevB, has:prevA>=0};
+}
+
+function bindTL(){
+  const bars=$('#tlbars'); let drag=false, s0=0;
+  const idx=e=>{const r=bars.getBoundingClientRect();
+    return Math.max(0,Math.min(DATA.meta.days.length-1,Math.floor((e.clientX-r.left)/r.width*DATA.meta.days.length)));};
+  const paint=()=>{document.querySelectorAll('#tlbars .b').forEach(b=>{const i=+b.dataset.i;
+    b.classList.toggle('in',i>=A&&i<=B);});
+    const w=winLabel(); $('#winlab').innerHTML=`${DATA.meta.days[A]} ~ ${DATA.meta.days[B]} · <b>${w.n}</b> 天`;};
+  bars.addEventListener('mousedown',e=>{drag=true;s0=idx(e);A=B=s0;paint();e.preventDefault();});
+  window.addEventListener('mousemove',e=>{if(!drag)return;const j=idx(e);A=Math.min(s0,j);B=Math.max(s0,j);paint();});
+  const endDrag=()=>{if(!drag)return;drag=false;paint();scheduleRender();};
+  window.addEventListener('mouseup',endDrag);
+  window.addEventListener('blur',endDrag);
+  bars.addEventListener('mouseleave',e=>{ if(drag && e.buttons===0) endDrag(); });
+  window._paint=paint;
+  document.querySelectorAll('.pill[data-d]').forEach(p=>p.onclick=()=>{
+    const n=+p.dataset.d, N=DATA.meta.days.length;
+    A=n? Math.max(0,N-n):0; B=N-1; paint(); scheduleRender();
+  });
+  ['d1','d2'].forEach(id=>document.getElementById(id).onchange=()=>{
+    const days=DATA.meta.days;
+    let i=days.indexOf($('#d1').value), j=days.indexOf($('#d2').value);
+    if(i<0)i=A; if(j<0)j=B; if(i>j){const t=i;i=j;j=t;}
+    A=i;B=j;paint();scheduleRender();});
+}
+
+const fmtN=v=>(v===null||v===undefined)?'—':(Math.round(v*10)/10);
+/* ---------------- 调整台账 ---------------- */
+function daysSince(d){
+  if(!d) return 999;
+  const t=new Date(d+'T00:00:00').getTime();
+  return Math.max(0, Math.floor((Date.now()-t)/86400000));
+}
+function adjOf(camp){
+  const l=ADJ[camp]; if(!l||!l.length) return null;
+  return l.slice().sort((a,b)=>(a.date||'').localeCompare(b.date||'')).pop();
+}
+function inCool(camp){ const a=adjOf(camp); return a && daysSince(a.date)<=COOL; }
+async function markAdj(camp, action){
+  const today=new Date(), pad=n=>String(n).padStart(2,'0');
+  const rec={date:`${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`,
+             ts:today.toLocaleString('zh-CN'), action:action||'调整', note:''};
+  if(!ONLINE){   // GitHub 在线版：存本机浏览器
+    let l=(ADJ[camp]||[]).filter(x=>x.date!==rec.date); l.push(rec);
+    ADJ[camp]=l; localStorage.setItem(LS.adj, JSON.stringify(ADJ));
+    toast('已记录（存在你这台浏览器）'); renderAdjBar(); scheduleRender(); return;
+  }
+  try{
+    const r=await (await fetch('api/adjust',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({camp:camp, action:action||'调整'})})).json();
+    if(r.ok){ (ADJ[camp]=ADJ[camp]||[]).push(r.rec); toast('已记录调整：'+camp.slice(0,26)); renderAdjBar(); scheduleRender(); }
+    else toast('记录失败：'+(r.err||''));
+  }catch(e){ toast('记录失败：'+e); }
+}
+function renderAdjBar(){
+  const sum=$('#adj-sum'); if(!sum) return;
+  const rows=[];
+  Object.keys(ADJ).forEach(c=>(ADJ[c]||[]).forEach(r=>rows.push({camp:c, ...r})));
+  rows.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const cooling=Object.keys(ADJ).filter(c=>inCool(c)).length;
+  $('#adj-sum').innerHTML=`共 ${Object.keys(ADJ).length} 个活动有调整记录 · 最近 ${rows.length} 次 · `
+    + `<span class="cool">冷却中 ${cooling} 个</span> <span class="free">可调 ${(DATA?Object.keys(DATA.camps).length:0)-cooling} 个</span>`;
+  $('#adj-list').innerHTML = rows.length? rows.slice(0,80).map(r=>{
+    const d=daysSince(r.date), cool=d<=COOL;
+    return `<div class="adjr"><span style="width:78px">${r.date}</span>
+      <span class="c" onclick="cp('${esc(r.camp).replace(/'/g,"\\'")}','已复制活动名')">${esc(r.camp)}</span>
+      <span style="color:var(--ink2)">${esc(r.action||'')} ${esc(r.note||'')}</span>
+      <span class="${cool?'cool':'free'}">${d} 天前${cool?' · 冷却中':''}</span></div>`;}).join('')
+    : `<div style="font-size:12.5px;color:var(--ink2);padding:6px 0">还没有记录。在下方活动卡片上点「✓ 标记已调」即可记账；调过一次后 ${COOL} 天内会标红提醒不要再动它。</div>`;
+}
+function adjChip(c){
+  const a=adjOf(c);
+  if(!a) return '';
+  const d=daysSince(a.date), cool=d<=COOL;
+  return `<span class="${cool?'cool':'free'}" title="${esc(a.action||'')} ${esc(a.note||'')}">上次调整 ${a.date.slice(5)}（${d}天前）${cool?' · 别再动':''}</span>`;
+}
+function warnsOf(it,w){
+  const r=[];
+  if(w.sp>=10&&w.clk>0&&w.ord===0) r.push('花钱没单');
+  if(w.acos!==null&&w.acos>30&&w.sp>=10) r.push('ACoS '+w.acos.toFixed(0)+'%');
+  if(it.ratio!==null&&it.ratio>=5&&it.clk7===0) r.push('有货不动(库销比'+it.ratio+',近7天0点击)');
+  return r;
+}
+
+function scheduleRender(){
+  const b=document.getElementById('busy');
+  b.style.display='block';
+  requestAnimationFrame(()=>setTimeout(()=>{ try{render();} finally { b.style.display='none'; } },0));
+}
+function moreRows(){ window._limit=9999; scheduleRender(); }
+function render(){
+  const m=DATA.meta, W=winLabel();
+  $('#sub').innerHTML=`广告明细 ${m.range[0]} ~ ${m.range[1]}（BI，${m.days_n} 天）· 金额已折算美元($) · 库存来自 ERP · 生成 ${new Date().toLocaleString('zh-CN')}`;
+  $('#th-spend').textContent=W.n+' 天花费';
+
+  // 全部/窗口合计（活动级去重口径，不用 ASIN 行相加）
+  const cur=agg(DATA.tot_d,A,B);
+  const prv=W.has?agg(DATA.tot_d,W.prevA,W.prevB):{sp:0,sa:0,clk:0,ord:0,imp:0,acos:null};
+  const d=(c,p,inv)=>{ if(!W.has||!p) return '<div class="delta flat">—</div>';
+    const ch=(c-p)/(p||1)*100, good=inv? -ch: ch;
+    const cls=Math.abs(ch)<3?'flat':(good>0?'down':'up');
+    return `<div class="delta ${cls}">环比${ch>0?'+':''}${ch.toFixed(1)}%</div>`;};
+  const kpi=(cls,lab,val,sub)=>`<div class="kpi ${cls}"><div class="lab">${lab}</div><div class="val">${val}</div>${sub||''}</div>`;
+  const ca=cur.sa?cur.sp/cur.sa*100:0, pa=prv.sa?prv.sp/prv.sa*100:0;
+  const pl=(v,inv)=>{if(!W.has)return '<div class="delta flat">—</div>';
+    const ch=v-pa; const cls=Math.abs(ch)<0.5?'flat':((inv? -ch: ch)>0?'down':'up');
+    return `<div class="delta ${cls}">上一窗口 ${pa.toFixed(1)}%</div>`;};
+  $('#kpis').innerHTML=[
+    kpi('blue',W.n+' 天广告花费','$'+cur.sp.toFixed(0),d(cur.sp,prv.sp,true)),
+    kpi('green',W.n+' 天广告销售额','$'+cur.sa.toFixed(0),d(cur.sa,prv.sa,false)),
+    kpi('red',W.n+' 天 ACoS',ca.toFixed(1)+'%',pl(ca,true)),
+    kpi('',W.n+' 天点击',cur.clk.toFixed(0),d(cur.clk,prv.clk,false)),
+    kpi('',W.n+' 天订单',cur.ord.toFixed(0),d(cur.ord,prv.ord,false)),
+  ].join('');
+
+  // 异常（按窗口）
+  const low=[],hi=[];
+  Object.keys(DATA.camps).forEach(c=>{
+    const v=DATA.camps[c], w=agg(v.d,A,B);
+    if(w.sp>=10&&w.clk>0&&w.ord===0) low.push({camp:c,type:v.type,shop:v.shop,sp:w.sp,clk:w.clk,asins:v.mine});
+    if(w.acos!==null&&w.acos>30&&w.sp>=10) hi.push({camp:c,type:v.type,shop:v.shop,acos:w.acos,sp:w.sp,sa:w.sa,asins:v.mine});
+  });
+  const rnc=[];
+  DATA.items.forEach(it=>{
+    if(it.ratio!==null&&it.ratio>=5&&it.clk7===0&&it.camps.length) rnc.push({asin:it.asin,sku:it.sku,name:it.name,
+      ratio:it.ratio,sp:it.spend7,camps:it.camps.slice(0,10)});});
+  const boxes=[['low','有点击 · 0 订单 · 花费≥$10',low.sort((a,b)=>b.sp-a.sp),'该时段有钱有点击但没出单 → 压竞价 / 加否词'],
+               ['acos','ACoS > 30%',hi.sort((a,b)=>b.sp-a.sp),'该时段 ACoS 超 30% 且花费 ≥ $10'],
+               ['rnc','高库销比 · 近7天0点击',rnc.sort((a,b)=>b.ratio-a.ratio),'可用库销比≥5（货多）却近 7 天一次点击都没有 → 有货推不动']];
+  $('#alertbars').innerHTML=boxes.map(([k,t,arr,dd])=>
+    `<div class="ab ${arr.length?'hot':''}"><div class="t">${t}</div><div class="n">${arr.length}</div><div class="d">${dd}</div></div>`).join('');
+  $('#alertcnt').textContent=`低效 ${low.length} · ACoS超标 ${hi.length} · 有货不动 ${rnc.length}`;
+  $('#alertdetail').innerHTML=boxes.map(([k,t,arr])=>{
+    if(!arr.length) return '';
+    const rows=arr.slice(0,60).map(x=>{
+      const nm=x.camp||(x.asin+' '+(x.sku||''));
+      return `<div class="arow"><span class="nm" onclick="cp('${esc(nm).replace(/'/g,"\\'")}','已复制')">${esc(nm)}</span>
+        <span class="num">$${(x.sp||0).toFixed(2)}</span>
+        <span style="color:#8899cc">${x.acos!==undefined? 'ACoS '+x.acos.toFixed(1)+'%' : (x.ratio!==undefined? '库销比 '+x.ratio : '')}</span></div>`;}).join('');
+    return `<details style="margin-top:9px"><summary style="cursor:pointer;font-size:13.5px;color:#3559c7">展开「${t}」${arr.length} 条</summary><div class="alist">${rows}</div></details>`;
+  }).join('');
+
+  // 主表
+  const q=$('#q').value.trim().toLowerCase(), fch=$('#fch').value, fg=$('#fgrade').value, so=$('#fsort').value;
+  let rows=DATA.items.map(it=>{
+    const w=agg(it.dd,A,B), p=W.has?agg(it.dd,W.prevA,W.prevB):null;
+    return {it,w,p,warns:warnsOf(it,w)};
+  }).filter(r=>{
+    const it=r.it;
+    if(fch&&it.ch!==fch)return false;
+    if(fg&&String(it.grade||'').trim()!==fg)return false;
+    if($('#onlywarn').checked&&!r.warns.length)return false;
+    if(q){const h=(it.asin+' '+it.sku+' '+it.name+' '+it.camps.join(' ')).toLowerCase();if(!h.includes(q))return false;}
+    return true;});
+  rows.sort((a,b)=> so==='acos'? ((b.w.acos??-1)-(a.w.acos??-1)) : so==='ratio'? ((b.it.ratio??-1)-(a.it.ratio??-1))
+    : so==='q'? (b.it.q-a.it.q) : so==='sa'? (b.w.sa-a.w.sa) : (b.w.sp-a.w.sp));
+  const _total=rows.length, _lim=window._limit||80;
+  if(_total>_lim) rows=rows.slice(0,_lim);
+  $('#maincnt').textContent=`${_total} 个 ASIN · ${W.n} 天口径`+(_total>_lim?`（先渲染前 ${_lim}，表底可加载全部）`:'');
+  window._rows=rows; window._total=_total; window._lim=_lim;
+
+  $('#tb').innerHTML=rows.map(({it,w,p,warns})=>{
+    const byType={};
+    it.camps.forEach(c=>{const t=DATA.camps[c].type;(byType[t]=byType[t]||[]).push(c);});
+    const tags=TYPE_ORDER.filter(t=>byType[t]).map(t=>
+      `<span class="tg" onclick="openFor('${it.asin}','${t}')">${t} <b>${byType[t].length}</b></span>`).join('');
+    const open=openRows.has(it.asin);
+    const ar = w.acos===null? (w.sp>0?'<div class="sku warn">无销售</div>':'<div class="sku">—</div>')
+             : `<div class="sku ${w.acos>30?'warn':''}">ACoS ${w.acos.toFixed(1)}%</div>`;
+    const chg = p? (()=>{const c=(w.sp-p.sp)/(p.sp||1)*100;
+      const cls=Math.abs(c)<5?'flat':(c>0?'up':'down');
+      return `<div class="delta ${cls}">花费${c>0?'+':''}${c.toFixed(0)}%</div>`;})() : '';
+    return `<tr class="item" id="r-${it.asin}">
+      <td class="tri" onclick="toggleRow('${it.asin}')">${open?'▾':'▸'}</td>
+      <td><div class="asin">${it.asin}</div><div class="sku">${esc(it.sku)}</div></td>
+      <td>${esc(it.name)} <span class="grade ${String(it.grade||'').charAt(0)}">${esc(it.grade)}</span>
+        ${warns.length?`<div class="nm2 warn">⚠ ${warns.join(' · ')}</div>`:''}</td>
+      <td>${esc(it.ch)}</td>
+      <td class="num">${it.fba}${it.fba_onway?` <span class="sku">(+${it.fba_onway})</span>`:''}</td>
+      <td class="num">${it.local||0}</td><td class="num">${it.overseas||0}</td>
+      <td class="num">${it.purchase||0}</td>
+      <td class="num">${fmtN(it.q)}</td>
+      <td class="num ${it.ratio!==null&&it.ratio<1?'warn':''}">${it.ratio===null?'—':it.ratio}
+        <div class="sku">FBA ${it.ratio_fba??'—'} · 全链路 ${it.ratio_all??'—'}</div></td>
+      <td class="num"><b>$${w.sp.toFixed(2)}</b>${ar}${chg}</td>
+      <td><div class="tagrow">${tags||'<span class="sku">无活动</span>'}</div></td>
+      <td><textarea class="note" data-k="${it.asin}" placeholder="备注（自动保存）">${esc(NOTES[it.asin]||'')}</textarea></td>
+    </tr>
+    <tr id="d-${it.asin}" style="display:${open?'':'none'}"><td></td><td colspan="12" class="detail" id="db-${it.asin}"></td></tr>`;
+  }).join('');
+  if(window._total>window._lim){
+    $('#tb').innerHTML += `<tr><td colspan="13" style="text-align:center;padding:15px">
+      <button class="btn" onclick="moreRows()">显示全部 ${window._total} 个 ASIN</button></td></tr>`;
+  }
+  document.querySelectorAll('.note').forEach(t=>{
+    t.addEventListener('input',()=>{NOTES[t.dataset.k]=t.value;});
+    t.addEventListener('blur',()=>saveNote(t.dataset.k,t.value));});
+  rows.forEach(r=>{if(openRows.has(r.it.asin))fillDetail(r.it.asin);});
+
+  // 多ASIN
+  const M=DATA.multi.map(mm=>({...mm,w:agg(DATA.camps[mm.camp].d,A,B)}))
+    .filter(mm=>mm.w.sp>0||true).sort((a,b)=>b.w.sp-a.w.sp);
+  window._M=M;
+  $('#multicnt').textContent=`${M.length} 个活动 · ${W.n} 天口径`;
+  $('#mtb').innerHTML=M.map((mm,i)=>{
+    const a=mm.acos30!==undefined&&mm.w.acos!==null?mm.w.acos:null;
+    return `<tr class="item"><td class="tri" onclick="toggleMulti(${i})" id="mt${i}">▸</td>
+    <td><span class="cn asin" style="font-size:12px;cursor:pointer" onclick="cp('${esc(mm.camp).replace(/'/g,"\\'")}','已复制')">${esc(mm.camp)}</span>
+      <div class="nm2">${esc(mm.shop||'')}</div></td>
+    <td>${esc(mm.type)}</td><td class="num"><b>${mm.n}</b></td>
+    <td class="num">$${mm.w.sp.toFixed(2)}</td>
+    <td class="num ${a>30?'warn':''}">${a===null?'—':a.toFixed(1)+'%'}</td>
+    <td class="num">${mm.w.clk}</td><td class="num">${mm.w.ord}</td></tr>
+    <tr id="mr${i}" style="display:none"><td></td><td colspan="7" class="detail"><div class="campbox" id="mb${i}"></div></td></tr>`;}).join('');
+  window._paint&&window._paint();
+  renderAdjBar();
+}
+
+function toggleRow(asin){
+  const tr=document.getElementById('d-'+asin);
+  if(!tr) return;
+  const tri=document.querySelector('#r-'+asin+' .tri');
+  const open=tr.style.display==='none';
+  tr.style.display=open?'':'none'; tri.textContent=open?'▾':'▸';
+  if(open){openRows.add(asin);fillDetail(asin);} else openRows.delete(asin);
+}
+function openFor(asin,type){
+  if(!openRows.has(asin)) toggleRow(asin);
+  const el=document.getElementById('db-'+asin);
+  if(el){el.scrollIntoView({block:'center'});el.querySelectorAll('.camp').forEach(c=>{
+    if(c.dataset.type===type)c.style.outline='2px solid #e5cf83';});
+    setTimeout(()=>el.querySelectorAll('.camp').forEach(c=>c.style.outline=''),1800);}
+}
+function spark(d){
+  let mx=1; const N=DATA.meta.days.length; const v=[];
+  for(let i=0;i<N;i++){const x=d[i];const s=x?x[0]:0;v.push(s);if(s>mx)mx=s;}
+  return `<div class="spark">`+v.map(s=>`<i style="height:${Math.max(1,s/mx*22).toFixed(1)}px" class="${s>0?'':'x'}"></i>`).join('')+`</div>`;
+}
+function campCard(c){
+  const v=DATA.camps[c], w=agg(v.d,A,B);
+  const st=v.lx_status==='enabled'?'<span class="badge b-on">开启</span>'
+    :(v.lx_status?`<span class="badge b-off">${esc(v.lx_status)}</span>`:'<span class="badge b-unknown">状态待核</span>');
+  const N=DATA.meta.days.length;
+  let lastDay=''; for(let i=N-1;i>=0;i--){const x=v.d[i]; if(x&&x[0]>0){lastDay=DATA.meta.days[i];break;}}
+  let firstDay=''; for(let i=0;i<N;i++){const x=v.d[i]; if(x){firstDay=DATA.meta.days[i];break;}}
+  return `<div class="camp" data-type="${esc(v.type)}">
+    <div class="cn" onclick="cp('${esc(c).replace(/'/g,"\\'")}','已复制活动名')">${esc(c)}</div>
+    <button class="markbtn" onclick="markAdj('${esc(c).replace(/'/g,"\\'")}')" title="记录今天调过这个活动，冷却期内会提醒不要再动">✓ 标记已调</button>
+    <div class="meta">${st}<span class="badge b-type">${esc(v.type)}</span>
+      ${v.shop&&v.shop!=='—'?`<span>${esc(v.shop)}</span>`:''}
+      <span>首见：${firstDay}</span><span>末次花费：${lastDay||'—'}</span>
+      <span>时段 <b>$${w.sp.toFixed(2)}</b></span>
+      <span>ACoS <b class="${w.acos>30?'warn':''}">${w.acos===null?'无销售':w.acos.toFixed(1)+'%'}</b></span>
+      <span>点击 <b>${w.clk}</b> · 订单 <b>${w.ord}</b> · 曝光 <b>${Math.round(w.imp)}</b></span>
+      ${adjChip(c)}
+    </div>${spark(v.d)}</div>`;
+}
+function fillDetail(asin){
+  const el=document.getElementById('db-'+asin);
+  if(!el) return;
+  const it=DATA.items.find(x=>x.asin===asin);
+  const byShop={};
+  it.camps.forEach(c=>{const s=DATA.camps[c].shop||'—';(byShop[s]=byShop[s]||[]).push(c);});
+  el.innerHTML=`<div class="campbox">`+Object.keys(byShop).sort().map(s=>
+    `<div class="shopgrp">店铺：${esc(s)}（${byShop[s].length} 个活动）</div>`
+    +byShop[s].sort((a,b)=>agg(DATA.camps[b].d,A,B).sp-agg(DATA.camps[a].d,A,B).sp).map(campCard).join('')
+  ).join('')+`</div>`;
+}
+function toggleMulti(i){
+  const tr=document.getElementById('mr'+i), t=document.getElementById('mt'+i);
+  const open=tr.style.display==='none';
+  tr.style.display=open?'':'none'; t.textContent=open?'▾':'▸';
+  if(open){const m=window._M[i];
+    document.getElementById('mb'+i).innerHTML=m.asins.map(a=>{
+      const meta=DATA.asin_meta[a]||{}, ini=DATA.items.find(x=>x.asin===a), mine=m.mine.includes(a);
+      const dl=(DATA.camps[m.camp].da_last||{})[a]||'';
+      const stopped = dl && dl < DATA.meta.range[1];
+      return `<div class="camp" style="${mine?'':'opacity:.55'}${stopped?';opacity:.45;background:#f7f8fa':''}">
+        <div class="asin" style="cursor:pointer${stopped?';color:#9aa5bb;text-decoration:line-through':''}" onclick="cp('${a}','已复制 ${a}')">${a}</div>
+        <div class="meta"><span class="sku">${esc(meta.sku||'')}</span><span>${esc(meta.name||'')}</span>
+        <span class="grade ${String(meta.grade||'').charAt(0)}">${esc(meta.grade||'')}</span>
+        <span>${esc(meta.ch||'')}</span>
+        <span>库销比 <b>${ini&&ini.ratio!==null?ini.ratio:'—'}</b></span>
+        <span>近30天销 <b>${ini?(ini.q||0):'—'}</b></span>${mine?'':'<i>非向海183</i>'}
+        ${stopped?`<span class="badge b-off">该活动下已停 · 末次 ${dl.slice(5)}</span>`:'<span class="badge b-on">该活动下在投</span>'}</div></div>`;
+    }).join('');}
+}
+function expandAll(){ (window._rows||[]).slice(0,40).forEach(r=>{if(!openRows.has(r.it.asin))toggleRow(r.it.asin);}); }
+function collapseAll(){ [...openRows].forEach(a=>toggleRow(a)); }
+async function saveNote(k,v){
+  if(!ONLINE){ NOTES[k]=v; localStorage.setItem(LS.notes, JSON.stringify(NOTES)); return; }
+  try{await fetch('api/note',{method:'POST',headers:{'Content-Type':'application/json'},
+  body:JSON.stringify({key:k,value:v})});}catch(e){}}
+async function loadHealth(){
+  if(!ONLINE){
+    $('#h-ts').innerHTML=`<span style="color:#3559c7">GitHub 在线版（只读快照）</span> · 数据取自最近一次本机刷新 · 台账与备注存在你这台浏览器 · 需要刷新数据用本机版 <b>http://172.22.23.200:8914/</b>`;
+    try{ const m=DATA.meta; $('#h-checks').innerHTML=
+      `<div class="chk"><span class="ok">✓</span><b style="min-width:110px">数据窗口</b><span style="color:var(--ink2)">${m.range[0]} ~ ${m.range[1]}（${m.days_n} 天）· 活动 ${m.camps} · ASIN ${m.with_ad}</span></div>`
+      + `<div class="chk"><span class="ok">✓</span><b style="min-width:110px">口径</b><span style="color:var(--ink2)">金额美元 · 库存 ERP · 库销比=库存÷近30天销量（月）</span></div>`
+      + `<div class="chk"><span class="${m.camps_with_status>=m.camps*0.9?'ok':'no'}">${m.camps_with_status>=m.camps*0.9?'✓':'⚠'}</span><b style="min-width:110px">领星状态</b><span style="color:var(--ink2)">${m.camps_with_status}/${m.camps} 个活动</span></div>`;
+    }catch(e){}
+    const b=document.querySelector('#healthCard button'); if(b){ b.textContent='本机版可一键刷新'; b.disabled=true; b.style.opacity=.6; }
+    return;
+  }
+  try{
+    const h=await (await fetch('api/health?t='+Date.now())).json();
+    if(!h.ts){ $('#h-ts').textContent='还没有刷新记录 —— 点右边按钮跑一次'; return; }
+    const bad=(h.checks||[]).filter(c=>!c.ok);
+    $('#h-ts').innerHTML=`上次刷新 ${h.ts}（${h.seconds||0}s）· 活动 ${(h.summary||{}).camps||0} · ASIN ${(h.summary||{}).items||0} · `
+      + (bad.length? `<span style="color:#c7484f;font-weight:700">${bad.length} 项需注意</span>` : `<span style="color:#2c855b;font-weight:700">全部通过 ✓</span>`)
+      + (h.refreshing? ' <span style="color:#3559c7">⏳ 正在刷新…</span>':'');
+    $('#h-checks').innerHTML=(h.checks||[]).map(c=>
+      `<div class="chk"><span class="${c.ok?'ok':'no'}">${c.ok?'✓':'⚠'}</span>
+        <b style="min-width:110px;font-weight:600">${esc(c.k)}</b>
+        <span style="color:var(--ink2)">${esc(c.msg)}</span></div>`).join('')
+      + (h.refresh_msg? `<div class="chk"><span>·</span><span style="color:var(--ink2);white-space:pre-wrap">${esc(h.refresh_msg).slice(-400)}</span></div>`:'');
+    if(h.refreshing) setTimeout(loadHealth, 4000);
+  }catch(e){ $('#h-ts').textContent='体检数据读取失败：'+e; }
+}
+async function doRefresh(){
+  if(!ONLINE){ toast('GitHub 在线版是每日快照，刷新请用本机版 http://172.22.23.200:8914/'); return; }
+  const r=await (await fetch('api/refresh',{method:'POST'})).json();
+  toast(r.msg||'已触发');
+  setTimeout(loadHealth, 2000);
+}
+$('#q').addEventListener('input',()=>{openRows.clear();scheduleRender();});
+['fch','fgrade','fsort','onlywarn'].forEach(id=>document.getElementById(id).addEventListener('change',()=>{openRows.clear();scheduleRender();}));
+window.addEventListener('focus',()=>loadHealth());
+load();
+loadHealth();
+</script></body></html>
