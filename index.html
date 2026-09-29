@@ -590,7 +590,6 @@ async function doRefresh(){
 }
 $('#q').addEventListener('input',()=>{openRows.clear();scheduleRender();});
 ['fch','fgrade','fsort','onlywarn'].forEach(id=>document.getElementById(id).addEventListener('change',()=>{openRows.clear();scheduleRender();}));
-window.addEventListener('focus',()=>loadHealth());
-load();
-loadHealth();
+window.addEventListener('focus',()=>{ if(DATA) loadHealth(); });
+load().then(()=>loadHealth());
 </script></body></html>
