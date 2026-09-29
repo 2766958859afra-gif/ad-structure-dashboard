@@ -1,0 +1,415 @@
+{
+ "generated": "2026-09-29 17:41:09",
+ "promo_day": "2026-10-06",
+ "range": [
+  "2026-08-11",
+  "2026-09-27"
+ ],
+ "close": [
+  {
+   "camp": "SP-AUTO-MIXS-向海-空气滤清器-B0F4CQHH71-第一批",
+   "type": "自动",
+   "shop": "—",
+   "spend30": 27.25,
+   "clk30": 50,
+   "ord30": 4,
+   "acos30": 61.7,
+   "cvr30": 8.0,
+   "spend14": 27.25,
+   "inv": 3,
+   "grade": "B（冲刺）",
+   "asins": [
+    "B0F4CQHH71"
+   ],
+   "dead": true
+  },
+  {
+   "camp": "SP-KW-MIXS-向海-空调滤清器-多ASIN-仅降低-大词第三批动销",
+   "type": "关键词-混合+大词",
+   "shop": "—",
+   "spend30": 25.94,
+   "clk30": 24,
+   "ord30": 2,
+   "acos30": 109.2,
+   "cvr30": 8.3,
+   "spend14": 14.9,
+   "inv": 195,
+   "grade": "C",
+   "asins": [
+    "B0BRS36PJ4",
+    "B0C36MSWPT",
+    "B0C36MV3NT",
+    "B0CF9JSCBL"
+   ],
+   "dead": false
+  },
+  {
+   "camp": "SP-KW-EX-向海-空调滤清器-B0C36MV3NT",
+   "type": "关键词-精准",
+   "shop": "—",
+   "spend30": 17.47,
+   "clk30": 6,
+   "ord30": 1,
+   "acos30": 140.9,
+   "cvr30": 16.7,
+   "spend14": 15.99,
+   "inv": 50,
+   "grade": "C",
+   "asins": [
+    "B0C36MV3NT"
+   ],
+   "dead": false
+  },
+  {
+   "camp": "SP-AUTO-MIXS-向海-空气滤清器-B0BR6J2TKQ-202603",
+   "type": "自动",
+   "shop": "US19-配件事业部",
+   "spend30": 15.82,
+   "clk30": 20,
+   "ord30": 2,
+   "acos30": 66.0,
+   "cvr30": 10.0,
+   "spend14": 11.84,
+   "inv": 341,
+   "grade": "B",
+   "asins": [
+    "B0BR6J2TKQ"
+   ],
+   "dead": false
+  },
+  {
+   "camp": "SP-AUTO-MIXS-向海-空气滤清器-B0BR6L8PT9-N-广告位调优",
+   "type": "自动",
+   "shop": "—",
+   "spend30": 15.03,
+   "clk30": 21,
+   "ord30": 1,
+   "acos30": 140.1,
+   "cvr30": 4.8,
+   "spend14": 11.64,
+   "inv": 165,
+   "grade": "B",
+   "asins": [
+    "B0BR6L8PT9"
+   ],
+   "dead": false
+  },
+  {
+   "camp": "SP-AUTO-MIXS-向海-空气滤清器-B0DLK8TF63",
+   "type": "自动",
+   "shop": "—",
+   "spend30": 14.61,
+   "clk30": 16,
+   "ord30": 1,
+   "acos30": 116.0,
+   "cvr30": 6.2,
+   "spend14": 14.61,
+   "inv": 5,
+   "grade": "C",
+   "asins": [
+    "B0DLK8TF63"
+   ],
+   "dead": true
+  },
+  {
+   "camp": "SP-AUTO-MIXS-向海-组套滤清-B0GLN3QWPZ-第二批-MIX自动广告-批量:2605268",
+   "type": "自动",
+   "shop": "—",
+   "spend30": 14.44,
+   "clk30": 13,
+   "ord30": 0,
+   "acos30": null,
+   "cvr30": 0.0,
+   "spend14": 14.44,
+   "inv": 76,
+   "grade": "C",
+   "asins": [
+    "B0GLN3QWPZ"
+   ],
+   "dead": false
+  },
+  {
+   "camp": "SP-AUTO-MIXS-空调滤清器-向海-B0C5XMLV4T-广告位调优",
+   "type": "自动",
+   "shop": "US19-配件事业部",
+   "spend30": 11.42,
+   "clk30": 12,
+   "ord30": 1,
+   "acos30": 91.6,
+   "cvr30": 8.3,
+   "spend14": 11.42,
+   "inv": 635,
+   "grade": "A（冲刺）",
+   "asins": [
+    "B0C5XMLV4T"
+   ],
+   "dead": false
+  },
+  {
+   "camp": "SP-KW-BR-向海-空气滤清器-B0CT7NBRB4",
+   "type": "关键词-广泛",
+   "shop": "Suncent USA Inc",
+   "spend30": 11.09,
+   "clk30": 11,
+   "ord30": 1,
+   "acos30": 94.9,
+   "cvr30": 9.1,
+   "spend14": 11.09,
+   "inv": 351,
+   "grade": "B",
+   "asins": [
+    "B0CT7NBRB4"
+   ],
+   "dead": false
+  },
+  {
+   "camp": "VC1-SP-AUTO-MIXS-向海-空气滤清器-B0D8L3Z8VF-固定-批量:26060116",
+   "type": "自动",
+   "shop": "VC1",
+   "spend30": 10.0,
+   "clk30": 22,
+   "ord30": 0,
+   "acos30": null,
+   "cvr30": 0.0,
+   "spend14": 10.0,
+   "inv": 121,
+   "grade": "C",
+   "asins": [
+    "B0D8L3Z8VF"
+   ],
+   "dead": false
+  },
+  {
+   "camp": "SP-AUTO-MIXS-向海空气滤清器-B0F4QTY4D4-202603",
+   "type": "自动",
+   "shop": "US34-配件事业部",
+   "spend30": 8.81,
+   "clk30": 13,
+   "ord30": 0,
+   "acos30": null,
+   "cvr30": 0.0,
+   "spend14": 8.34,
+   "inv": 35,
+   "grade": "D",
+   "asins": [
+    "B0F4QTY4D4"
+   ],
+   "dead": false
+  },
+  {
+   "camp": "SP-KW-EX-向海-空气滤清器-B0D632M2YD",
+   "type": "关键词-精准",
+   "shop": "Suncent USA Inc",
+   "spend30": 8.81,
+   "clk30": 7,
+   "ord30": 1,
+   "acos30": 61.7,
+   "cvr30": 14.3,
+   "spend14": 8.81,
+   "inv": 1,
+   "grade": "C",
+   "asins": [
+    "B0D632M2YD"
+   ],
+   "dead": true
+  }
+ ],
+ "price": [
+  {
+   "camp": "SP-KW-BR-空气滤清器-向海-B0D8L3Z8VF",
+   "type": "关键词-广泛",
+   "shop": "Suncent USA Inc",
+   "spend30": 57.92,
+   "clk30": 48,
+   "ord30": 6,
+   "acos30": 40.2,
+   "cvr30": 12.5,
+   "spend14": 54.81,
+   "inv": 121,
+   "grade": "C",
+   "asins": [
+    "B0D8L3Z8VF"
+   ],
+   "dead": false
+  },
+  {
+   "camp": "SP-AUTO-MIXS-向海-空调滤清器-多ASIN-VC1-自动捡漏",
+   "type": "自动",
+   "shop": "—",
+   "spend30": 48.98,
+   "clk30": 51,
+   "ord30": 7,
+   "acos30": 50.3,
+   "cvr30": 13.7,
+   "spend14": 14.23,
+   "inv": 117,
+   "grade": "B（冲刺）",
+   "asins": [
+    "B0C36NBFT8",
+    "B0CF9GTXG1",
+    "B0CJC1YWX2",
+    "B0D631CMSL"
+   ],
+   "dead": false
+  },
+  {
+   "camp": "SP-PAT-ASIN-空气滤清器-向海-B09KPD86FH",
+   "type": "定位-商品竞对",
+   "shop": "Suncent USA Inc",
+   "spend30": 47.28,
+   "clk30": 56,
+   "ord30": 7,
+   "acos30": 46.1,
+   "cvr30": 12.5,
+   "spend14": 47.28,
+   "inv": 344,
+   "grade": "S",
+   "asins": [
+    "B09KPD86FH"
+   ],
+   "dead": false
+  },
+  {
+   "camp": "SP-AUTO-MIXS-向海-空气滤清-B0D635WDPB-型号词-第二批-VC",
+   "type": "自动",
+   "shop": "—",
+   "spend30": 28.27,
+   "clk30": 37,
+   "ord30": 4,
+   "acos30": 44.1,
+   "cvr30": 10.8,
+   "spend14": 28.27,
+   "inv": 34,
+   "grade": "B",
+   "asins": [
+    "B0D635WDPB"
+   ],
+   "dead": false
+  },
+  {
+   "camp": "SP-KW-EX-向海-空气滤清器-B0BR6L8PT9-广告位调优",
+   "type": "关键词-精准",
+   "shop": "Suncent USA Inc",
+   "spend30": 21.91,
+   "clk30": 16,
+   "ord30": 4,
+   "acos30": 51.0,
+   "cvr30": 25.0,
+   "spend14": 21.91,
+   "inv": 165,
+   "grade": "B",
+   "asins": [
+    "B0BR6L8PT9"
+   ],
+   "dead": false
+  },
+  {
+   "camp": "SP-KW-MIXS-向海-空气滤清器-B0F4CQHH71",
+   "type": "关键词-混合",
+   "shop": "Suncent USA Inc",
+   "spend30": 19.45,
+   "clk30": 23,
+   "ord30": 3,
+   "acos30": 58.2,
+   "cvr30": 13.0,
+   "spend14": 19.45,
+   "inv": 3,
+   "grade": "B（冲刺）",
+   "asins": [
+    "B0F4CQHH71"
+   ],
+   "dead": true
+  },
+  {
+   "camp": "SP-KW-BR-向海-空气滤清器-B0BR6L8PT9-广告位调优",
+   "type": "关键词-广泛",
+   "shop": "—",
+   "spend30": 18.57,
+   "clk30": 21,
+   "ord30": 2,
+   "acos30": 50.6,
+   "cvr30": 9.5,
+   "spend14": 17.49,
+   "inv": 165,
+   "grade": "B",
+   "asins": [
+    "B0BR6L8PT9"
+   ],
+   "dead": false
+  },
+  {
+   "camp": "SP-KW-BR-向海-滤清器-B0D8P5Q74F-6200ACF366ZUS",
+   "type": "关键词-广泛",
+   "shop": "Suncent USA Inc",
+   "spend30": 16.09,
+   "clk30": 15,
+   "ord30": 2,
+   "acos30": 55.9,
+   "cvr30": 13.3,
+   "spend14": 12.19,
+   "inv": 108,
+   "grade": "C",
+   "asins": [
+    "B0D8P5Q74F"
+   ],
+   "dead": false
+  },
+  {
+   "camp": "SP-KW-EX-向海-空调滤清器-B0C36M76Z3",
+   "type": "关键词-精准",
+   "shop": "US19-配件事业部",
+   "spend30": 15.19,
+   "clk30": 10,
+   "ord30": 3,
+   "acos30": 46.9,
+   "cvr30": 30.0,
+   "spend14": 10.51,
+   "inv": 110,
+   "grade": "C",
+   "asins": [
+    "B0C36M76Z3"
+   ],
+   "dead": false
+  },
+  {
+   "camp": "SP-KW-MIXS-向海-滤清器组合套装-B0GJ2V239S-车型词-第二批",
+   "type": "关键词-混合",
+   "shop": "US19-配件事业部",
+   "spend30": 14.68,
+   "clk30": 12,
+   "ord30": 1,
+   "acos30": 57.9,
+   "cvr30": 8.3,
+   "spend14": 14.68,
+   "inv": 30,
+   "grade": "C",
+   "asins": [
+    "B0GJ2V239S"
+   ],
+   "dead": false
+  },
+  {
+   "camp": "SP-KW-MIXS-向海-空调滤清器-B0C36M6GC7-US19",
+   "type": "关键词-混合",
+   "shop": "US19-配件事业部",
+   "spend30": 8.42,
+   "clk30": 6,
+   "ord30": 1,
+   "acos30": 59.2,
+   "cvr30": 16.7,
+   "spend14": 8.42,
+   "inv": 131,
+   "grade": "D",
+   "asins": [
+    "B0C36M6GC7"
+   ],
+   "dead": false
+  }
+ ],
+ "summary": {
+  "close_n": 12,
+  "price_n": 11,
+  "close_spend": 180.69,
+  "price_spend": 296.76
+ }
+}

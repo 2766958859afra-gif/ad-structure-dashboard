@@ -117,6 +117,10 @@ tr.coolrow{background:#fffafa}
 <h1>向海 · 商编广告结构与时段分析</h1>
 <p class="sub" id="sub">加载中…</p>
 
+<div id="tabbar" style="display:flex;gap:8px;margin:0 0 14px 0">
+  <button class="tb on" data-t="ads" onclick="switchTab('ads')" style="padding:9px 20px;border:none;border-radius:9px;cursor:pointer;font-size:14px;font-weight:600;background:#3559c7;color:#fff">📊 广告结构</button>
+  <button class="tb" data-t="promo" onclick="switchTab('promo')" style="padding:9px 20px;border:none;border-radius:9px;cursor:pointer;font-size:14px;font-weight:600;background:#e8ecf7;color:#37456a">🎯 大促作战<span id="pg-badge" style="margin-left:6px;font-size:12px;color:#c7484f;font-weight:700"></span></button>
+</div>
 <div class="card tl">
   <div class="row1">
     <button class="pill" data-d="7">近 7 天</button>
@@ -189,6 +193,29 @@ tr.coolrow{background:#fffafa}
 <tbody id="mtb"></tbody></table></div></div>
 
 <div class="foot" id="foot"></div>
+</div>
+<div id="pagePromo" style="display:none;position:fixed;inset:0;z-index:60;overflow:auto;background:#f4f6fa;padding:22px 28px">
+ <div style="max-width:1560px">
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <h1 style="margin:0;font-size:22px">🎯 大促作战 · 10.6</h1>
+    <span id="pg-sum" style="font-size:13.5px;color:#4c5a80"></span>
+    <button class="btn ghost" style="margin-left:auto" onclick="switchTab('ads')">← 回到广告结构</button>
+  </div>
+  <div class="card" style="margin-top:14px;padding:15px 18px">
+    <div style="font-size:13.5px;color:#4c5a80;line-height:1.95">
+      口径：<b>近 14 天 + 近 30 天都差</b>才算「持续差」（只看单日会误杀）。<br>
+      勾选 = 你在领星已经操作完（关闭 / 压价），勾选会<b>自动写进调整台账</b>并带上 7 天冷却锁，大促后我按台账提醒你打开。
+      <span id="pg-note" style="color:#a06a2c"></span>
+    </div>
+    <div style="height:9px;background:#e3e8f3;border-radius:5px;margin-top:12px;overflow:hidden"><i id="pg-bar" style="display:block;height:100%;width:0;background:#2c855b;transition:width .35s"></i></div>
+    <div id="pg-stat" style="font-size:12.5px;color:#4c5a80;margin-top:7px"></div>
+  </div>
+  <div class="sec" style="margin-top:14px"><h2 style="cursor:default">🔴 建议直接关闭 <span class="cnt" id="pg-c1"></span></h2>
+    <div class="body"><div id="pg-close"></div></div></div>
+  <div class="sec" style="margin-top:14px"><h2 style="cursor:default">🟡 建议压价 20~30% <span class="cnt" id="pg-c2"></span></h2>
+    <div class="body"><div id="pg-price"></div></div></div>
+  <div class="foot" id="pg-foot" style="margin-top:18px"></div>
+ </div>
 </div>
 <div class="busy" id="busy">⏳ 正在重算…</div>
 <div class="toast" id="toast"></div>
@@ -316,6 +343,82 @@ async function markAdj(camp, action){
     if(r.ok){ (ADJ[camp]=ADJ[camp]||[]).push(r.rec); toast('已记录调整：'+camp.slice(0,26)); renderAdjBar(); scheduleRender(); }
     else toast('记录失败：'+(r.err||''));
   }catch(e){ toast('记录失败：'+e); }
+}
+/* ---------------- 大促作战页签 ---------------- */
+let PROMO=null, PTASKS={};
+function switchTab(t){
+  document.querySelectorAll('#tabbar .tb').forEach(b=>{
+    const on = b.dataset.t===t;
+    b.style.background = on ? '#3559c7' : '#e8ecf7';
+    b.style.color = on ? '#fff' : '#37456a';
+  });
+  $('#pagePromo').style.display = (t==='promo') ? 'block' : 'none';
+  if(t==='promo' && !PROMO) loadPromo();
+}
+async function loadPromo(){
+  try{ PROMO = await (await fetch('promo.json?t='+Date.now())).json(); }catch(e){ PROMO=null; }
+  if(ONLINE){ try{ PTASKS = await (await fetch('api/promo')).json(); }catch(e){ PTASKS={}; } }
+  else { try{ PTASKS = JSON.parse(localStorage.getItem('adboard_promo')||'{}'); }catch(e){ PTASKS={}; } }
+  renderPromo();
+}
+function pRow(r, action){
+  const done = !!(PTASKS[r.camp] && PTASKS[r.camp].done);
+  const cd = r.camp.replace(/'/g,"\\'");
+  const a = (r.acos30===null||r.acos30===undefined) ? '无销售' : r.acos30.toFixed(0)+'%';
+  const c = (r.cvr30===null||r.cvr30===undefined) ? '—' : r.cvr30.toFixed(1)+'%';
+  const inv = r.inv<=5
+    ? `<span style="color:#c7484f;font-weight:700">库存仅 ${r.inv} → 关了别开</span>`
+    : `库存 ${r.inv}`;
+  return `<div style="display:flex;gap:12px;align-items:flex-start;padding:10px 4px;border-top:1px dashed var(--line);${done?'opacity:.45':''}">
+    <input type="checkbox" ${done?'checked':''} onchange="togglePromo(this,'${cd}','${action}')"
+      style="margin-top:3px;width:17px;height:17px;cursor:pointer;flex:none">
+    <div style="flex:1;min-width:0">
+      <div style="font-family:Consolas,monospace;font-size:12.5px;color:#2a3550;cursor:pointer;${done?'text-decoration:line-through':''}"
+        onclick="cp('${cd}','已复制活动名')" title="点击复制">${esc(r.camp)}</div>
+      <div style="font-size:12.5px;color:#4c5a80;margin-top:3px">
+        <b style="color:#c7484f">$${(r.spend30||0).toFixed(2)}</b> · 点击 ${r.clk30} · 订单 ${r.ord30} ·
+        ACoS <b>${a}</b> · CVR ${c} · ${inv} · ${esc(r.grade||'—')} · ${esc(r.shop)}</div>
+      <div style="font-size:12px;color:#8899cc;margin-top:2px">${(r.asins||[]).join(' ')}</div>
+    </div></div>`;
+}
+function renderPromo(){
+  if(!PROMO){ $('#pg-stat').textContent='清单还没生成 —— 在广告结构页点一次「一键刷新」即可'; return; }
+  const n1=PROMO.close.length, n2=PROMO.price.length;
+  $('#pg-c1').textContent = `（${n1} 个 · 近30天 $${(PROMO.summary.close_spend||0).toFixed(0)}）`;
+  $('#pg-c2').textContent = `（${n2} 个 · 近30天 $${(PROMO.summary.price_spend||0).toFixed(0)}）`;
+  $('#pg-close').innerHTML = PROMO.close.map(r=>pRow(r,'大促前关闭')).join('')
+    || '<div style="padding:12px;color:#8899cc">没有需要关闭的活动</div>';
+  $('#pg-price').innerHTML = PROMO.price.map(r=>pRow(r,'大促前压价')).join('')
+    || '<div style="padding:12px;color:#8899cc">没有需要压价的活动</div>';
+  const all=[...PROMO.close.map(r=>r.camp), ...PROMO.price.map(r=>r.camp)];
+  const doneN = all.filter(c=>PTASKS[c]&&PTASKS[c].done).length, tot=all.length;
+  $('#pg-bar').style.width = (tot? doneN/tot*100 : 0)+'%';
+  $('#pg-stat').innerHTML = `已处理 <b>${doneN}/${tot}</b> · 剩 ${tot-doneN} 个` +
+    (doneN? ' · 台账已同步' : '') + (tot&&doneN===tot? ' · 🎉 全部完成，大促后我会提醒你打开' : '');
+  $('#pg-sum').textContent = `共 ${tot} 个待处理 · 数据 ${PROMO.range[0]} ~ ${PROMO.range[1]}`;
+  $('#pg-foot').innerHTML = `清单生成于 ${PROMO.generated} · 大促日 ${PROMO.promo_day}<br>
+    判定：近14天与近30天<b>同时</b>满足「有点击无订单 / ACoS&gt;60% / CVR&lt;5%」→ 🔴建议关；ACoS 40~60% 或 CVR 5~8% → 🟡建议压价。<br>
+    勾选自动写入调整台账（带 7 天冷却锁）；取消勾选会撤销当天那条台账记录。`;
+  const b=$('#pg-badge'); if(b) b.textContent = doneN===tot&&tot ? '✓已完成' : `${doneN}/${tot}`;
+}
+async function togglePromo(el, camp, action){
+  const done = el.checked;
+  if(!ONLINE){
+    if(done) PTASKS[camp]={done:true, ts:new Date().toLocaleString('zh-CN')}; else delete PTASKS[camp];
+    localStorage.setItem('adboard_promo', JSON.stringify(PTASKS));
+    toast(done?'已勾选（存本机浏览器）':'已取消'); renderPromo(); return;
+  }
+  try{
+    const r = await (await fetch('api/promo',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({camp:camp, done:done, action:action})})).json();
+    if(r.ok){
+      PTASKS = r.tasks || {};
+      toast(done ? ('已完成并记账：'+camp.slice(0,24)) : '已取消，台账记录已撤销');
+      renderPromo();
+      try{ ADJ = await (await fetch('api/adjustments?t='+Date.now())).json(); }catch(e){}
+      renderAdjBar(); scheduleRender();
+    } else { el.checked=!done; toast('操作失败：'+(r.err||'')); }
+  }catch(e){ el.checked=!done; toast('操作失败：'+e); }
 }
 function renderAdjBar(){
   const sum=$('#adj-sum'); if(!sum) return;
